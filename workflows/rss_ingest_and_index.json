@@ -1,0 +1,360 @@
+{
+  "name": "AI News - RSS Ingest + PGVector Insert",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "rss_urls",
+              "value": "={{$env.RSS_URLS || 'https://openai.com/news/rss.xml,https://blog.google/technology/ai/rss/'}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2",
+      "name": "Set RSS URLs",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -920,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const raw = ($json.rss_urls || '').trim();\nif (!raw) {\n  throw new Error('RSS_URLS env var is empty');\n}\n\nconst urls = [...new Set(\n  raw\n    .split(/[,\\n]+/)\n    .map((u) => u.trim())\n    .filter(Boolean)\n)];\n\nif (!urls.length) {\n  throw new Error('No RSS URLs were provided');\n}\n\nreturn urls.map((rssUrl) => ({\n  json: { rss_url: rssUrl }\n}));"
+      },
+      "id": "3",
+      "name": "Split RSS URLs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -700,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$json.rss_url}}",
+        "options": {}
+      },
+      "id": "4",
+      "name": "RSS Feed Read",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -420,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const configuredLimit = Number($env.RSS_MAX_ITEMS || 60);\nconst limit = Number.isFinite(configuredLimit) && configuredLimit > 0\n  ? configuredLimit\n  : 60;\n\nconst sorted = [...items].sort((a, b) => {\n  const aTs = new Date(a.json.isoDate || a.json.pubDate || 0).getTime() || 0;\n  const bTs = new Date(b.json.isoDate || b.json.pubDate || 0).getTime() || 0;\n  return bTs - aTs;\n});\n\nconst seen = new Set();\nconst out = [];\n\nfor (const item of sorted) {\n  const url = String(item.json.link || item.json.url || '').trim();\n  if (!url || seen.has(url)) continue;\n\n  seen.add(url);\n  out.push(item);\n\n  if (out.length >= limit) break;\n}\n\nreturn out;"
+      },
+      "id": "15",
+      "name": "Take First 60",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -40,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const stripHtml = (value) => String(value || '').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim();\nconst out = [];\n\nfor (const item of items) {\n  const row = item.json || {};\n  if (!row.link || !row.title) {\n    continue;\n  }\n\n  const asDate = row.isoDate || row.pubDate || new Date().toISOString();\n  const sourceFromLink = (() => {\n    try {\n      return new URL(row.link || row.feedUrl || '').hostname.replace(/^www\\./, '');\n    } catch {\n      return 'unknown';\n    }\n  })();\n\n  const category = Array.isArray(row.categories)\n    ? row.categories.join(', ')\n    : (row.category || 'general');\n\n  const summary = stripHtml(row.contentSnippet || row.summary || '');\n  const content = stripHtml(row.content || row['content:encoded'] || summary);\n\n  out.push({\n    json: {\n      title: String(row.title).trim().slice(0, 500),\n      url: String(row.link).trim(),\n      source: sourceFromLink,\n      published_at: asDate,\n      category,\n      summary: summary.slice(0, 1500),\n      content: content.slice(0, 25000)\n    }\n  });\n}\n\nreturn out;"
+      },
+      "id": "5",
+      "name": "Normalize Article",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const esc = (v) => v === null || v === undefined || v === ''\n  ? 'NULL'\n  : `'${String(v).replace(/'/g, \"''\")}'`;\n\nreturn items.map((item) => {\n  const row = item.json || {};\n  return {\n    json: {\n      ...row,\n      sql: {\n        title: esc(row.title),\n        url: esc(row.url),\n        source: esc(row.source),\n        published_at: esc(row.published_at),\n        category: esc(row.category),\n        summary: esc(row.summary),\n        content: esc(row.content)\n      }\n    }\n  };\n});"
+      },
+      "id": "6",
+      "name": "Prepare SQL Values",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS n8n_vectors (\n  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\n  text text,\n  metadata jsonb,\n  embedding vector\n);\n\nWITH upserted AS (\n  INSERT INTO articles (title, url, source, published_at, category, summary, content, updated_at)\n  VALUES (\n    {{$json.sql.title}},\n    {{$json.sql.url}},\n    {{$json.sql.source}},\n    {{$json.sql.published_at}}::timestamptz,\n    {{$json.sql.category}},\n    {{$json.sql.summary}},\n    {{$json.sql.content}},\n    NOW()\n  )\n  ON CONFLICT (url) DO UPDATE SET\n    title = EXCLUDED.title,\n    source = EXCLUDED.source,\n    published_at = EXCLUDED.published_at,\n    category = EXCLUDED.category,\n    summary = EXCLUDED.summary,\n    content = EXCLUDED.content,\n    updated_at = NOW()\n  RETURNING id, title, url, source, published_at, category, summary, content\n), deleted AS (\n  DELETE FROM n8n_vectors\n  WHERE metadata->>'article_id' = (SELECT id::text FROM upserted)\n)\nSELECT id, title, url, source, published_at, category, summary, content\nFROM upserted;",
+        "options": {}
+      },
+      "id": "7",
+      "name": "Upsert Article",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        620,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return items.map((item) => {\n  const row = item.json || {};\n  const text = `${row.title || ''}\\n\\n${row.summary || ''}\\n\\n${row.content || ''}`.trim();\n  return {\n    json: {\n      text,\n      article_id: row.id,\n      source: row.source,\n      category: row.category,\n      published_at: row.published_at,\n      url: row.url\n    }\n  };\n});"
+      },
+      "id": "8",
+      "name": "Prepare Vector Document",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        840,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "options": {}
+      },
+      "id": "9",
+      "name": "PGVector Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.2,
+      "position": [
+        1080,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small",
+        "options": {}
+      },
+      "id": "10",
+      "name": "OpenAI Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        920,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ JSON.stringify({ text: $json.text, article_id: $json.article_id, source: $json.source, category: $json.category, published_at: $json.published_at, url: $json.url }) }}",
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "article_id",
+                "value": "={{ String($json.article_id) }}"
+              },
+              {
+                "name": "source",
+                "value": "={{ $json.source }}"
+              },
+              {
+                "name": "category",
+                "value": "={{ $json.category }}"
+              },
+              {
+                "name": "published_at",
+                "value": "={{ String($json.published_at) }}"
+              },
+              {
+                "name": "url",
+                "value": "={{ $json.url }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "11",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "chunkSize": "={{ Number($env.CHUNK_SIZE || 1200) }}",
+        "chunkOverlap": "={{ Number($env.CHUNK_OVERLAP || 200) }}",
+        "options": {}
+      },
+      "id": "12",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1410,
+        740
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set RSS URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set RSS URLs": {
+      "main": [
+        [
+          {
+            "node": "Split RSS URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split RSS URLs": {
+      "main": [
+        [
+          {
+            "node": "RSS Feed Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Feed Read": {
+      "main": [
+        [
+          {
+            "node": "Take First 60",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Take First 60": {
+      "main": [
+        [
+          {
+            "node": "Normalize Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Article": {
+      "main": [
+        [
+          {
+            "node": "Prepare SQL Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare SQL Values": {
+      "main": [
+        [
+          {
+            "node": "Upsert Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Article": {
+      "main": [
+        [
+          {
+            "node": "Prepare Vector Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Vector Document": {
+      "main": [
+        [
+          {
+            "node": "PGVector Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "PGVector Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "PGVector Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "active": false,
+  "versionId": "60bc2f7f-1e14-451d-9a13-4ec8078447b7"
+}

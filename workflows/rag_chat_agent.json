@@ -1,0 +1,152 @@
+{
+  "name": "AI News - RAG Chat Agent (AI Agent + PGVector)",
+  "nodes": [
+    {
+      "id": "1",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "2",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        280,
+        0
+      ],
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an AI news assistant. Use the retriever tool to answer questions from indexed news data. Keep answers concise and always include source URLs found in retrieved context."
+        }
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "3",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        120,
+        220
+      ],
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "4",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        320,
+        220
+      ],
+      "parameters": {},
+      "typeVersion": 1.3
+    },
+    {
+      "id": "5",
+      "name": "PGVector Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "position": [
+        600,
+        220
+      ],
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "retriever",
+        "toolDescription": "Retrieve relevant AI news chunks from Postgres PGVector and return context with source URLs.",
+        "tableName": "n8n_vectors",
+        "topK": "={{ Number($env.RAG_TOP_K || 6) }}",
+        "options": {}
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "6",
+      "name": "OpenAI Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        520,
+        440
+      ],
+      "parameters": {
+        "model": "text-embedding-3-small"
+      },
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PGVector Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "PGVector Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "active": false,
+  "versionId": "8f1cc7dd-f924-4f7e-af25-93029f747590"
+}

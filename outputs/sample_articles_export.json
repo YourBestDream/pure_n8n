@@ -1,0 +1,202 @@
+﻿[
+    {
+        "id": 1,
+        "url": "https://openai.com/index/first-proof-submissions",
+        "title": "Our First Proof submissions",
+        "source": "unknown",
+        "content": "We share our AI model’s proof attempts for the First Proof math challenge, testing research-grade reasoning on expert-level problems.",
+        "summary": "We share our AI model’s proof attempts for the First Proof math challenge, testing research-grade reasoning on expert-level problems.",
+        "category": "Research",
+        "published_at": "2026-02-20T14:30:00+00:00"
+    },
+    {
+        "id": 2,
+        "url": "https://openai.com/index/advancing-independent-research-ai-alignment",
+        "title": "Advancing independent research on AI alignment",
+        "source": "unknown",
+        "content": "OpenAI commits $7.5M to The Alignment Project to fund independent AI alignment research, strengthening global efforts to address AGI safety and security risks.",
+        "summary": "OpenAI commits $7.5M to The Alignment Project to fund independent AI alignment research, strengthening global efforts to address AGI safety and security risks.",
+        "category": "Global Affairs",
+        "published_at": "2026-02-19T10:00:00+00:00"
+    },
+    {
+        "id": 4,
+        "url": "https://blog.google/innovation-and-ai/technology/ai/ai-impact-summit-2026-collection/",
+        "title": "AI Impact Summit 2026",
+        "source": "unknown",
+        "content": "A look at the partnerships and investments Google announced at the AI Impact Summit 2026.",
+        "summary": "A look at the partnerships and investments Google announced at the AI Impact Summit 2026.",
+        "category": "AI",
+        "published_at": "2026-02-19T04:30:00+00:00"
+    },
+    {
+        "id": 3,
+        "url": "https://blog.google/company-news/inside-google/message-ceo/sundar-pichai-ai-impact-summit-2026/",
+        "title": "“No technology has me dreaming bigger than AI”",
+        "source": "unknown",
+        "content": "CEO Sundar Pichai’s remarks at the opening ceremony of the AI Impact Summit 2026",
+        "summary": "CEO Sundar Pichai’s remarks at the opening ceremony of the AI Impact Summit 2026",
+        "category": "A message from our CEO, AI",
+        "published_at": "2026-02-19T04:30:00+00:00"
+    },
+    {
+        "id": 5,
+        "url": "https://openai.com/index/openai-for-india",
+        "title": "Introducing OpenAI for India",
+        "source": "unknown",
+        "content": "OpenAI for India expands AI access across the country—building local infrastructure, powering enterprises, and advancing workforce skills.",
+        "summary": "OpenAI for India expands AI access across the country—building local infrastructure, powering enterprises, and advancing workforce skills.",
+        "category": "Global Affairs",
+        "published_at": "2026-02-18T21:00:00+00:00"
+    },
+    {
+        "id": 6,
+        "url": "https://blog.google/innovation-and-ai/products/gemini-app/lyria-3/",
+        "title": "A new way to express yourself: Gemini can now create music",
+        "source": "unknown",
+        "content": "Lyria 3 is now available in the Gemini app. Create custom, high-quality 30-second tracks from text and images.",
+        "summary": "Lyria 3 is now available in the Gemini app. Create custom, high-quality 30-second tracks from text and images.",
+        "category": "Gemini App, AI",
+        "published_at": "2026-02-18T16:00:00+00:00"
+    },
+    {
+        "id": 7,
+        "url": "https://blog.google/innovation-and-ai/technology/ai/ai-impact-summit-2026-india/",
+        "title": "AI Impact Summit 2026: How we’re partnering to make AI work for everyone",
+        "source": "unknown",
+        "content": "An overview of Google’s new global partnerships and funding announcements at the AI Impact Summit in India.",
+        "summary": "An overview of Google’s new global partnerships and funding announcements at the AI Impact Summit in India.",
+        "category": "Google.org, Google in Asia, AI",
+        "published_at": "2026-02-18T10:30:00+00:00"
+    },
+    {
+        "id": 8,
+        "url": "https://blog.google/innovation-and-ai/products/responsible-ai-2026-report-ongoing-work/",
+        "title": "Our 2026 Responsible AI Progress Report",
+        "source": "unknown",
+        "content": "A look at our 2026 Responsible AI Progress Report.",
+        "summary": "A look at our 2026 Responsible AI Progress Report.",
+        "category": "AI",
+        "published_at": "2026-02-17T22:30:00+00:00"
+    },
+    {
+        "id": 9,
+        "url": "https://openai.com/index/new-result-theoretical-physics",
+        "title": "GPT-5.2 derives a new result in theoretical physics",
+        "source": "unknown",
+        "content": "A new preprint shows GPT-5.2 proposing a new formula for a gluon amplitude, later formally proved and verified by OpenAI and academic collaborators.",
+        "summary": "A new preprint shows GPT-5.2 proposing a new formula for a gluon amplitude, later formally proved and verified by OpenAI and academic collaborators.",
+        "category": "Research",
+        "published_at": "2026-02-13T11:00:00+00:00"
+    },
+    {
+        "id": 10,
+        "url": "https://openai.com/index/introducing-lockdown-mode-and-elevated-risk-labels-in-chatgpt",
+        "title": "Introducing Lockdown Mode and Elevated Risk labels in ChatGPT",
+        "source": "unknown",
+        "content": "Introducing Lockdown Mode and Elevated Risk labels in ChatGPT to help organizations defend against prompt injection and AI-driven data exfiltration.",
+        "summary": "Introducing Lockdown Mode and Elevated Risk labels in ChatGPT to help organizations defend against prompt injection and AI-driven data exfiltration.",
+        "category": "Safety",
+        "published_at": "2026-02-13T10:00:00+00:00"
+    },
+    {
+        "id": 12,
+        "url": "https://openai.com/index/beyond-rate-limits",
+        "title": "Beyond rate limits: scaling access to Codex and Sora",
+        "source": "unknown",
+        "content": "How OpenAI built a real-time access system combining rate limits, usage tracking, and credits to power continuous access to Sora and Codex.",
+        "summary": "How OpenAI built a real-time access system combining rate limits, usage tracking, and credits to power continuous access to Sora and Codex.",
+        "category": "Engineering",
+        "published_at": "2026-02-13T09:00:00+00:00"
+    },
+    {
+        "id": 11,
+        "url": "https://openai.com/index/scaling-social-science-research",
+        "title": "Scaling social science research",
+        "source": "unknown",
+        "content": "GABRIEL is a new open-source toolkit from OpenAI that uses GPT to turn qualitative text and images into quantitative data, helping social scientists analyze research at scale.",
+        "summary": "GABRIEL is a new open-source toolkit from OpenAI that uses GPT to turn qualitative text and images into quantitative data, helping social scientists analyze research at scale.",
+        "category": "Global Affairs",
+        "published_at": "2026-02-13T09:00:00+00:00"
+    },
+    {
+        "id": 13,
+        "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-deep-think/",
+        "title": "Gemini 3 Deep Think: Advancing science, research and engineering",
+        "source": "unknown",
+        "content": "We’re releasing a major upgrade to Gemini 3 Deep Think, our specialized reasoning mode.",
+        "summary": "We’re releasing a major upgrade to Gemini 3 Deep Think, our specialized reasoning mode.",
+        "category": "Gemini models, Google One, Google DeepMind, AI",
+        "published_at": "2026-02-12T16:13:00+00:00"
+    },
+    {
+        "id": 14,
+        "url": "https://openai.com/index/introducing-gpt-5-3-codex-spark",
+        "title": "Introducing GPT-5.3-Codex-Spark",
+        "source": "unknown",
+        "content": "Introducing GPT-5.3-Codex-Spark—our first real-time coding model. 15x faster generation, 128k context, now in research preview for ChatGPT Pro users.",
+        "summary": "Introducing GPT-5.3-Codex-Spark—our first real-time coding model. 15x faster generation, 128k context, now in research preview for ChatGPT Pro users.",
+        "category": "Product",
+        "published_at": "2026-02-12T10:00:00+00:00"
+    },
+    {
+        "id": 15,
+        "url": "https://openai.com/index/harness-engineering",
+        "title": "Harness engineering: leveraging Codex in an agent-first world",
+        "source": "unknown",
+        "content": "By Ryan Lopopolo, Member of the Technical Staff",
+        "summary": "By Ryan Lopopolo, Member of the Technical Staff",
+        "category": "Engineering",
+        "published_at": "2026-02-11T09:00:00+00:00"
+    },
+    {
+        "id": 16,
+        "url": "https://blog.google/products-and-platforms/products/photos/ask-button-ask-photos-tips/",
+        "title": "9 fun questions to try asking Google Photos",
+        "source": "unknown",
+        "content": "Learn more about Google Photos’ new Ask button as well as other functions of its Ask Photos feature.",
+        "summary": "Learn more about Google Photos’ new Ask button as well as other functions of its Ask Photos feature.",
+        "category": "Photos, AI",
+        "published_at": "2026-02-10T17:00:00+00:00"
+    },
+    {
+        "id": 17,
+        "url": "https://blog.google/innovation-and-ai/technology/safety-security/safer-internet-day-2026-kids-teens/",
+        "title": "Helping kids and teens learn and grow online on Safer Internet Day",
+        "source": "unknown",
+        "content": "We’re sharing our latest updates designed to support families, kids and teens in the digital world.",
+        "summary": "We’re sharing our latest updates designed to support families, kids and teens in the digital world.",
+        "category": "Safety & Security, AI",
+        "published_at": "2026-02-10T02:30:00+00:00"
+    },
+    {
+        "id": 19,
+        "url": "https://openai.com/index/testing-ads-in-chatgpt",
+        "title": "Testing ads in ChatGPT",
+        "source": "unknown",
+        "content": "OpenAI begins testing ads in ChatGPT to support free access, with clear labeling, answer independence, strong privacy protections, and user control.",
+        "summary": "OpenAI begins testing ads in ChatGPT to support free access, with clear labeling, answer independence, strong privacy protections, and user control.",
+        "category": "Company",
+        "published_at": "2026-02-09T11:00:00+00:00"
+    },
+    {
+        "id": 18,
+        "url": "https://openai.com/index/bringing-chatgpt-to-genaimil",
+        "title": "Bringing ChatGPT to GenAI.mil",
+        "source": "unknown",
+        "content": "OpenAI for Government announces the deployment of a custom ChatGPT on GenAI.mil, bringing secure, safety-forward AI to U.S. defense teams.",
+        "summary": "OpenAI for Government announces the deployment of a custom ChatGPT on GenAI.mil, bringing secure, safety-forward AI to U.S. defense teams.",
+        "category": "Global Affairs",
+        "published_at": "2026-02-09T11:00:00+00:00"
+    },
+    {
+        "id": 20,
+        "url": "https://openai.com/index/our-approach-to-localization",
+        "title": "Making AI work for everyone, everywhere: our approach to localization",
+        "source": "unknown",
+        "content": "OpenAI shares its approach to AI localization, showing how globally shared frontier models can be adapted to local languages, laws, and cultures without compromising safety.",
+        "summary": "OpenAI shares its approach to AI localization, showing how globally shared frontier models can be adapted to local languages, laws, and cultures without compromising safety.",
+        "category": "Global Affairs",
+        "published_at": "2026-02-06T10:00:00+00:00"
+    }
+]

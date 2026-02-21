@@ -1,0 +1,123 @@
+{
+  "name": "AI News - Weekly Digest Markdown",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, title, url, source, category, summary, published_at\nFROM articles\nWHERE published_at >= NOW() - INTERVAL '7 days'\nORDER BY COALESCE(category, source, 'other'), published_at DESC;"
+      },
+      "id": "2",
+      "name": "Fetch Last 7 Days",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        -340,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst start = new Date(now);\nstart.setDate(now.getDate() - 7);\n\nconst fmt = (d) => d.toISOString().slice(0, 10);\nconst weekStart = fmt(start);\nconst weekEnd = fmt(now);\n\nconst grouped = {};\nfor (const item of items) {\n  const row = item.json;\n  const group = row.category || row.source || 'other';\n  if (!grouped[group]) grouped[group] = [];\n  grouped[group].push(row);\n}\n\nlet md = `# AI News Digest\\n\\n**Week:** ${weekStart} to ${weekEnd}\\n\\n`;\n\nfor (const group of Object.keys(grouped).sort()) {\n  md += `## ${group}\\n\\n`;\n  for (const row of grouped[group]) {\n    const published = row.published_at ? String(row.published_at).slice(0, 10) : 'unknown-date';\n    const summary = (row.summary || '').replace(/\\s+/g, ' ').trim();\n    md += `- **${row.title || 'Untitled'}**\\n`;\n    md += `  - Summary: ${summary || 'No summary available.'}\\n`;\n    md += `  - Source: ${row.source || 'unknown'}\\n`;\n    md += `  - Date: ${published}\\n`;\n    md += `  - URL: ${row.url || ''}\\n\\n`;\n  }\n}\n\nif (!items.length) {\n  md += '_No articles found in the last 7 days._\\n';\n}\n\nreturn [{\n  json: {\n    week_start: weekStart,\n    week_end: weekEnd,\n    article_count: items.length,\n    markdown: md\n  }\n}];"
+      },
+      "id": "3",
+      "name": "Build Markdown",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileName = `weekly-ai-digest-${$json.week_end}.md`;\nconst filePath = $env.DIGEST_OUTPUT_PATH || `/workspace/outputs/${fileName}`;\nconst markdown = $json.markdown || '';\n\nreturn [{\n  json: {\n    ...$json,\n    output_path: filePath,\n    file_name: fileName\n  },\n  binary: {\n    data: {\n      data: Buffer.from(markdown, 'utf8').toString('base64'),\n      mimeType: 'text/markdown',\n      fileName\n    }\n  }\n}];"
+      },
+      "id": "4",
+      "name": "Prepare Markdown File",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "fileName": "={{$json.output_path}}",
+        "dataPropertyName": "data",
+        "options": {}
+      },
+      "id": "5",
+      "name": "Write Markdown File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        320,
+        260
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Last 7 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Last 7 Days": {
+      "main": [
+        [
+          {
+            "node": "Build Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Markdown": {
+      "main": [
+        [
+          {
+            "node": "Prepare Markdown File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Markdown File": {
+      "main": [
+        [
+          {
+            "node": "Write Markdown File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "active": false,
+  "versionId": "6b372f24-f493-4f71-a65a-45ea9e416652"
+}
